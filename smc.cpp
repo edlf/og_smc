@@ -1257,6 +1257,7 @@ void update_LEDs() {
       return;
     }
 
+    // DVD eject in progress?
     if (checkBitNo(flags.bitfield_DATA_6F, 5)) {
       state.leds = led_state::quick_green_blink;
       return;
@@ -1331,7 +1332,7 @@ void update_LEDs() {
     break;
 
   case led_state::reset_phase_counter: // 8
-    leds.state_counter = 3;
+    leds.state_counter = 3; // ? gets overwritten by the initial state with 6...
     state.leds = led_state::initial;
     break;
 
@@ -2099,13 +2100,16 @@ void set_fan_speed() {
 void read_temperatures() {
   // Function only valid for 1.0-1.4
 
-  // CPU
-  if (pico_hal::read_byte(I2C_TEMP_SENSOR_ADDRESS, 0x01, &(sensors.CPU_temperature))) {
-    sensors.CPU_temperature_previous = sensors.CPU_temperature;
-  }
+  // TODO: CPU
+  sensors.CPU_temperature = 55;
+  sensors.CPU_temperature_previous = sensors.CPU_temperature;
+  sensors.board_temperature = 55;
+  // if (i2c_read(I2C_TEMP_SENSOR_ADDRESS, 0x01, &(sensors.CPU_temperature))) {
+  //   sensors.CPU_temperature_previous = sensors.CPU_temperature;
+  // }
 
   // Board, near MCPX for 1.0-1.4
-  pico_hal::read_byte(I2C_TEMP_SENSOR_ADDRESS, 0x02, &(sensors.board_temperature));
+  // i2c_read(I2C_TEMP_SENSOR_ADDRESS, 0x02, &(sensors.board_temperature));
 }
 
 void boot_challenge_compute() {

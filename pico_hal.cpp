@@ -126,15 +126,6 @@ void set_fan_speed(uint16_t level) {
   pwm_set_gpio_level(pins::FAN_PWM1, level);
 }
 
-bool read_byte(const uint8_t device, const uint8_t reg, uint8_t* out) {
-  if (out != nullptr) {
-    *out = 99;
-    return true;
-  }
-
-  return false;
-}
-
 void init() {
   printf("Init GPIO\n");
   gpio_set_function(pins::LED_RED, GPIO_FUNC_SIO);
