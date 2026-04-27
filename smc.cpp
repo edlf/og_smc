@@ -29,7 +29,6 @@ state_struct state_previous;
 flags_struct flags;
 sensors_struct sensors;
 timers_struct timers;
-config_struct config;
 
 void resetInterruptReason() {
   flags.interrupt_reason = 0;
@@ -349,14 +348,9 @@ void globals_init() {
   sensors.vmode = 0;
   sensors.vmode_raw = 0;
 
-  config.LED_green_manual_cycles = 0;
-  config.LED_red_manual_cycles = 0;
-
   /* Initialize timer variables */
   timers.power_timeout = 0;
-  timers.power_timeout2 = 0;
   timers.power_timeout3 = 0;
-  timers.boot_response_timeout = 0;
 }
 
 } // namespace SMC

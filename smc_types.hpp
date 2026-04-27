@@ -170,19 +170,12 @@ typedef struct {
 
 typedef struct {
   uint16_t power_timeout;
-  uint16_t power_timeout2;
   uint16_t power_timeout3;
-  uint16_t boot_response_timeout;
   uint16_t smbus_attempt_counter;
   uint16_t tray_state_timer;
   uint16_t eject_timeout;
   uint16_t dvd_tray_timeout;
 } timers_struct;
-
-typedef struct {
-  uint8_t LED_red_manual_cycles;
-  uint8_t LED_green_manual_cycles;
-} config_struct;
 
 } // namespace SMC
 

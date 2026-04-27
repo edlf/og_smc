@@ -17,7 +17,6 @@ extern state_struct state_previous;
 extern flags_struct flags;
 extern sensors_struct sensors;
 extern timers_struct timers;
-extern config_struct config;
 extern bool something_with_cpu_temp;
 extern volatile uint8_t ram_test_response0;
 extern volatile uint8_t ram_test_response1;
