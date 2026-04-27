@@ -47,9 +47,6 @@ uint8_t update_power_standby();
 
 void update_PLL_SYSRESET();
 
-void update_pwr_sw();
-void update_eject_sw();
-
 void update_LEDs();
 
 }  // namespace SMC

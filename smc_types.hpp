@@ -70,20 +70,6 @@ enum class smi_power_state {
   wait_state_for_initial
 };
 
-enum class eject_switch_state {
-  wait_for_button_press,
-  debouncing,
-  wait_for_button_release,
-  release_debounce
-};
-
-enum class power_switch_state {
-  wait_for_button_press,
-  debouncing,
-  wait_for_button_release,
-  release_debounce
-};
-
 enum class power_standby_state {
   initial,
   read_av,
@@ -132,8 +118,6 @@ enum class update_dvd_tray_three_state {
 
 // State Machines
 typedef struct {
-  power_switch_state pwr_sw;
-  eject_switch_state eject_sw;
   power_standby_state standby_power;
   pll_sysreset_state pll_reset;
 

@@ -7,6 +7,7 @@
 #include "smc_boot_challenge.hpp"
 #include "smc_smbus.hpp"
 #include "smc_dvd.hpp"
+#include "smc_front_panel_sw.hpp"
 
 // Pico stuff
 #include "hardware/i2c.h"
@@ -207,9 +208,7 @@ void main_loop() {
 
   /* Initialize state variables */
   state.standby_power = power_standby_state::initial;
-  state.pwr_sw = power_switch_state::wait_for_button_press;
-  state.eject_sw = eject_switch_state::wait_for_button_press;
-
+  FrontPanelSW::init();
   Fan::init();
   state.dvd_tray = dvd_tray_state::initial;
   Video::init();
@@ -255,8 +254,7 @@ void main_loop() {
         DVD::update_dvd_tray();
         DVD::update_eject_tray();
         Video::update();
-        update_pwr_sw();
-        update_eject_sw();
+        FrontPanelSW::update();
         DVD::update_dvd_tray_eject();
         DVD::update_dvd_tray_three();
         AudioClamp::update();
@@ -296,7 +294,7 @@ void main_loop() {
       do {
         wait_for_isr();
         pico_hal::petWatchdog();
-        update_pwr_sw();
+        FrontPanelSW::updatePower();
         timers.power_timeout3--;
       } while (timers.power_timeout3 != 0);
 
@@ -324,8 +322,7 @@ void globals_init() {
   state.pll_reset = pll_sysreset_state::initial;
   state.update_eject_tray = update_eject_tray_state::initial;
   state.dvd_tray_three = update_dvd_tray_three_state::initial;
-  state.pwr_sw = power_switch_state::wait_for_button_press;
-  state.eject_sw = eject_switch_state::wait_for_button_press;
+  FrontPanelSW::init();
   state.smi_power = smi_power_state::decision_state;
   state.dvd_tray = dvd_tray_state::initial;
   state.tray_eject = 0;
