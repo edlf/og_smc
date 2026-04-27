@@ -211,7 +211,7 @@ void main_loop() {
   state.pwr_sw = power_switch_state::wait_for_button_press;
   state.eject_sw = eject_switch_state::wait_for_button_press;
 
-  state.fan_control = fan_control_state::initial;
+  Fan::init();
   state.dvd_tray = dvd_tray_state::initial;
   Video::init();
   AudioClamp::init();
@@ -275,12 +275,11 @@ void main_loop() {
         pico_hal::petWatchdog();
       }
 
-      sensors.fan_speed = 0;
-      Fan::set_fan_speed();
+      Fan::applyFanSpeed();
 
       state.standby_power = power_standby_state::initial;
       // jump_index_sub_code_828 = 0;
-      state.fan_control = fan_control_state::initial;
+      Fan::init();
       state.dvd_tray = dvd_tray_state::initial;
       Video::init();
       AudioClamp::init();
@@ -322,7 +321,7 @@ void globals_init() {
   something_with_cpu_temp = true;
 
   state.standby_power = power_standby_state::initial;
-  state.fan_control = fan_control_state::initial;
+  Fan::init();
   state.pll_reset = pll_sysreset_state::initial;
   state.update_eject_tray = update_eject_tray_state::initial;
   state.dvd_tray_three = update_dvd_tray_three_state::initial;
@@ -343,7 +342,6 @@ void globals_init() {
   flags.bitfield_DATA_74 = 0;
 
   /* Initialize sensor/config variables */
-  sensors.fan_speed = 0;
   sensors.CPU_temperature = 0;
   sensors.board_temperature = 0;
   sensors.CPU_temp_predicted = 0;
@@ -351,7 +349,6 @@ void globals_init() {
   sensors.vmode = 0;
   sensors.vmode_raw = 0;
 
-  config.custom_fan_speed = 10; /* Default custom fan speed */
   config.LED_green_manual_cycles = 0;
   config.LED_red_manual_cycles = 0;
 
@@ -360,8 +357,6 @@ void globals_init() {
   timers.power_timeout2 = 0;
   timers.power_timeout3 = 0;
   timers.boot_response_timeout = 0;
-  timers.fan_control_timeout1 = 0;
-  timers.fan_control_timeout2 = 0;
 }
 
 } // namespace SMC

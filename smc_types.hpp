@@ -98,23 +98,6 @@ enum class power_standby_state {
   powered_up
 };
 
-enum class fan_control_state {
-  initial,
-  state1,
-  decision_state,
-  overheated,
-  overheated_cooldown,
-  state5,
-  custom_fan_speed,
-  board_cool,
-  board_hot,
-  state9,
-  state10,
-  state11,
-  cpu_hot,
-  state13
-};
-
 enum class pll_sysreset_state {
   initial,
   state1,
@@ -152,7 +135,6 @@ typedef struct {
   power_switch_state pwr_sw;
   eject_switch_state eject_sw;
   power_standby_state standby_power;
-  fan_control_state fan_control;
   pll_sysreset_state pll_reset;
 
   smi_power_state smi_power;
@@ -180,7 +162,6 @@ typedef struct {
   uint8_t CPU_temperature_previous;
   uint8_t board_temperature;
   uint8_t CPU_temp_predicted;
-  uint8_t fan_speed;
   uint8_t tray_status;
   uint8_t tray_status_raw;
   uint8_t vmode;
@@ -191,8 +172,6 @@ typedef struct {
   uint16_t power_timeout;
   uint16_t power_timeout2;
   uint16_t power_timeout3;
-  uint16_t fan_control_timeout1;
-  uint16_t fan_control_timeout2;
   uint16_t boot_response_timeout;
   uint16_t smbus_attempt_counter;
   uint16_t tray_state_timer;
@@ -201,7 +180,6 @@ typedef struct {
 } timers_struct;
 
 typedef struct {
-  uint8_t custom_fan_speed;
   uint8_t LED_red_manual_cycles;
   uint8_t LED_green_manual_cycles;
 } config_struct;
