@@ -301,14 +301,6 @@ void reenableInterrupts(uint32_t status) {
   __asm volatile("msr PRIMASK,%0" ::"r"(status) :);
 }
 
-// TODO use sdk instead
-static uint64_t get_time(void) {
-  // Reading low latches the high value
-  uint32_t lo = timer_hw->timelr;
-  uint32_t hi = timer_hw->timehr;
-  return ((uint64_t)hi << 32u) | lo;
-}
-
 #define ALARM0_IRQ timer_hardware_alarm_get_irq_num(timer_hw, 0)
 #define ALARM1_IRQ timer_hardware_alarm_get_irq_num(timer_hw, 1)
 
@@ -406,6 +398,10 @@ uint32_t get_ms_since_boot() {
 
 void disable_and_discard_interrupts() {
   (void) save_and_disable_interrupts();
+}
+
+void busyWait_ms(uint16_t ms) {
+  busy_wait_ms(ms);
 }
 
 } // namespace hal

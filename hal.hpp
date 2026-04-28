@@ -64,6 +64,7 @@ void setupI2C();
 
 // Time
 uint32_t get_ms_since_boot();
+void busyWait_ms(uint16_t ms);
 
 } // namespace hal
 

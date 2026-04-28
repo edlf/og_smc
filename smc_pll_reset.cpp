@@ -3,7 +3,6 @@
 #include "smc_fan.hpp"
 #include "hal.hpp"
 #include "utils.hpp"
-#include "pico/stdlib.h" // TODO move busywait to hal
 
 #include <vector>
 #include <string>
@@ -116,7 +115,7 @@ void update() {
     flags.bitfield_DATA_73 |= 0x08; // Set initialization flag
 
     /* Wait for encoder communication */
-    busy_wait_ms(132);
+    hal::busyWait_ms(132);
 
     // TODO: Send SMBus write command
 
@@ -129,7 +128,7 @@ void update() {
     flags.bitfield_DATA_73 |= 0x08; // Set initialization flag
 
     /* Wait for encoder communication */
-    busy_wait_ms(132); // Delay ~832 cycles
+    hal::busyWait_ms(120);
 
     state = pll_sysreset_state::state8;
     break;

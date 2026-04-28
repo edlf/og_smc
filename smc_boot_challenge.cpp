@@ -173,7 +173,7 @@ void update() {
       flags.bitfield_DATA_71 &= ~0x10;
       flags.bitfield_DATA_71 &= ~0x20;
 
-      /* TODO: Update challenge bytes for next boot */
+      // TODO: Update challenge bytes for next boot
       state = boot_challenge_state::initial;
     } else if (flags.bitfield_DATA_70 & 0x01) {
       /* System overheated - stay in this state */
