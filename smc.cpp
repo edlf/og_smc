@@ -55,6 +55,8 @@ uint8_t checkStatusBit(uint8_t status_bit) {
 }
 
 void fireSystemInterrupt() {
+  debug::print_message("SMC: Fire System Interrupt");
+
   /* Pulse SMI signal (RA4) low to signal system interrupt */
   hal::smi_pin_off();
   sleep_ms(20);
@@ -62,6 +64,8 @@ void fireSystemInterrupt() {
 }
 
 void configureConexantEncoder() {
+  debug::print_message("SMC: Configure Conexant Encoder");
+
   constexpr size_t len = 2;
   uint8_t config[len] = {0xBA, 0x3F};
   i2c_write_burst_blocking(i2c0, 0x8A, config, len);
@@ -76,11 +80,13 @@ void smc_gpio_callback(unsigned int gpio, uint32_t events) {
 
   switch (gpio) {
   case pins::SW_EJECT:
-    debug::print_message("ISRL: Eject switch");
+    debug::print_message("ISR: Eject switch");
     setInterruptReason(InterruptReason_eject_sw_pressed);
     break;
 
   case pins::POWER_OK:
+    debug::print_message("ISR: power OK");
+
     // ISR got called, but somehow power good didnt stay enabled
     if (!hal::get_power_ok()) {
       // Power supply failure - shutdown sequence
@@ -93,8 +99,6 @@ void smc_gpio_callback(unsigned int gpio, uint32_t events) {
       // Enter infinite loop waiting for watchdog timer to reset the system
       panic("POWER_OK timeout");
     }
-
-    debug::print_message("ISR: power OK");
     break;
 
   case pins::SW_POWER:
@@ -103,17 +107,17 @@ void smc_gpio_callback(unsigned int gpio, uint32_t events) {
     break;
 
   case pins::VIDEO_MODE_0:
-    debug::print_message("ISR: vm0");
+    debug::print_message("ISR: AV Port Pin 0");
     Video::update();
     break;
 
   case pins::VIDEO_MODE_1:
-    debug::print_message("ISR: vm1");
+    debug::print_message("ISR: AV Port Pin 1");
     Video::update();
     break;
 
   case pins::VIDEO_MODE_2:
-    debug::print_message("ISR: vm2");
+    debug::print_message("ISR: AV Port Pin 2");
     Video::update();
     break;
 
