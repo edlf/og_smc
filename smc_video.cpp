@@ -1,7 +1,7 @@
 #include "smc_video.hpp"
 #include "smc.hpp"
 #include "debug.hpp"
-#include "pico_hal.hpp"
+#include "hal.hpp"
 
 namespace SMC {
 namespace Video {
@@ -15,7 +15,7 @@ void init() {
 }
 
 void update() {
-  SMC::sensors.vmode_raw = pico_hal::get_video_mode();
+  SMC::sensors.vmode_raw = hal::get_video_mode();
 
   if (previous_video_mode != SMC::sensors.vmode_raw) {
     printMode(SMC::sensors.vmode_raw);

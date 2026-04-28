@@ -3,7 +3,7 @@
 #include "smc_dvd.hpp"
 #include "smc.hpp"
 #include "smc_pll_reset.hpp"
-#include "pico_hal.hpp"
+#include "hal.hpp"
 #include "utils.hpp"
 
 #include <vector>
@@ -344,7 +344,7 @@ uint8_t update() {
 
   case smi_power_state::case15:
     /* Get tray status and wait for stable state */
-    sensors.tray_status = pico_hal::get_tray_state();
+    sensors.tray_status = hal::get_tray_state();
 
     if ((sensors.tray_status == 0x00) || (sensors.tray_status == 0x40) || (sensors.tray_status == 0x60)) {
       state = smi_power_state::leds_off;
@@ -356,7 +356,7 @@ uint8_t update() {
   case smi_power_state::delayed_turning_off:
     /* Delayed turning power off */
     if (--timers.power_timeout == 0) {
-      pico_hal::turn_off_psu();
+      hal::turn_off_psu();
       state = smi_power_state::initial;
     }
     break;

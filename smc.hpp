@@ -52,6 +52,8 @@ void smc_gpio_callback(unsigned int gpio, uint32_t events);
 
 void update_LEDs();
 
+void shutdown_xbox();
+void panic(const std::string message);
 }  // namespace SMC
 
 #endif  // __SMC__
