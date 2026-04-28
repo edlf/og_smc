@@ -56,7 +56,7 @@ void updatePower() {
     break;
 
   case switch_state::debouncing:
-    // TODO: state.smi_power = smi_power_state::overheat_cooldown_wait;
+    SMI::setStateOverheatCooldownWait();
     if (hal::power_button_pressed()) {
       setStatusBit(power_change_requested);
       pwr_state = switch_state::wait_for_button_release;

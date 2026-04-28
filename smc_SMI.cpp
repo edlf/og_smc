@@ -34,10 +34,17 @@ const std::vector<std::string> smi_state_names {
 };
 
 smi_power_state state;
-uint16_t power_timeout2;
+uint16_t power_timeout = 0;
+uint16_t power_timeout2 = 0;
 
 void init() {
   state = smi_power_state::decision_state;
+  power_timeout = 0;
+  power_timeout2 = 0;
+}
+
+void setStateOverheatCooldownWait() {
+  state = smi_power_state::overheat_cooldown_wait;
 }
 
 void setStateCase11() {
@@ -64,7 +71,7 @@ bool isXboxPowered() {
 }
 
 uint8_t update() {
-  // debug::print_message("update_SMI_and_power");
+  printState();
   // Manages power interrupts and SMI signaling when Xbox is powered up
 
   // State starts at 9 when powered on, and stops at 9 when powered off
@@ -153,7 +160,7 @@ uint8_t update() {
     break;
 
   case smi_power_state::process_power_off_conditions:
-    timers.power_timeout = 25;
+    power_timeout = 25;
     power_timeout2 = 3;
 
     if (checkStatusBit(power_change_requested)) {
@@ -190,7 +197,7 @@ uint8_t update() {
       } else if (flags.bitfield_DATA_70 & 0x20) {
         state = smi_power_state::case13;
       } else {
-        if (--timers.power_timeout == 0) {
+        if (--power_timeout == 0) {
           state = smi_power_state::request_tray_close;
         }
       }
@@ -222,7 +229,7 @@ uint8_t update() {
 
   case smi_power_state::case5:
     /* Intermediate state */
-    timers.power_timeout = 0xFF;
+    power_timeout = 0xFF;
     flags.bitfield_DATA_70 &= ~0x20;
     flags.bitfield_DATA_6F |= 0x40;
     state = smi_power_state::check_ram_test_results;
@@ -230,7 +237,7 @@ uint8_t update() {
 
   case smi_power_state::request_tray_close:
     setStatusBit(prepare_for_shutdown); // System shutting down
-    timers.power_timeout = 25;
+    power_timeout = 25;
     state = smi_power_state::wait_tray_close;
     break;
 
@@ -241,16 +248,16 @@ uint8_t update() {
     flags.bitfield_DATA_6F &= ~0x02;
     flags.bitfield_DATA_70 &= ~0x20;
     flags.bitfield_DATA_6F &= ~0x40;
-    timers.power_timeout = 25;
+    power_timeout = 25;
     state = smi_power_state::delay;
     break;
 
   case smi_power_state::wait_tray_close:
     if (AudioClamp::isClamped() && Dvd::isTrayClosing()) {
-      timers.power_timeout = 0xFF;
+      power_timeout = 0xFF;
       state = smi_power_state::wait_for_tray_stable;
-    } else if (--timers.power_timeout == 0) {
-      timers.power_timeout = 0xFF;
+    } else if (--power_timeout == 0) {
+      power_timeout = 0xFF;
       state = smi_power_state::wait_for_tray_stable;
     }
     break;
@@ -280,7 +287,7 @@ uint8_t update() {
 
   case smi_power_state::overheat_cooldown_wait:
     if ((checkStatusBit(overheated)) == 0) {
-      timers.power_timeout = 1;
+      power_timeout = 1;
       state = smi_power_state::delay;
     }
     break;
@@ -300,7 +307,7 @@ uint8_t update() {
     } else if (flags.bitfield_DATA_71 & 0x08) {
       state = smi_power_state::going_to_reset;
     } else {
-      if (--timers.power_timeout == 0) {
+      if (--power_timeout == 0) {
         state = smi_power_state::going_to_reset;
       }
     }
@@ -327,10 +334,10 @@ uint8_t update() {
 
   case smi_power_state::delay:
     if (PLL_Reset::isState1()) {
-      if (--timers.power_timeout == 0) {
+      if (--power_timeout == 0) {
         /* Proceed */
       }
-    } else if (--timers.power_timeout == 0) {
+    } else if (--power_timeout == 0) {
       /* Proceed */
     }
     break;
@@ -340,21 +347,21 @@ uint8_t update() {
 
     if ((sensors.tray_status == 0x00) || (sensors.tray_status == 0x40) || (sensors.tray_status == 0x60)) {
       state = smi_power_state::leds_off;
-    } else if (--timers.power_timeout == 0) {
+    } else if (--power_timeout == 0) {
       state = smi_power_state::leds_off;
     }
     break;
 
   case smi_power_state::delayed_turning_off:
     /* Delayed turning power off */
-    if (--timers.power_timeout == 0) {
+    if (--power_timeout == 0) {
       hal::turn_off_psu();
       state = smi_power_state::initial;
     }
     break;
 
   case smi_power_state::wait_state_for_power_cycle:
-    if (--timers.power_timeout == 0) {
+    if (--power_timeout == 0) {
       state = smi_power_state::initial;
     }
     break;

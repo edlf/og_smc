@@ -13,9 +13,10 @@ constexpr uint8_t max_fan_speed = 50;
 
 uint8_t cpu_temperature_history[temperature_history_length];
 uint8_t board_temperature_history[temperature_history_length];
+uint8_t CPU_temp_predicted = 0;
 
-uint16_t control_timeout;
-uint16_t control_timeout2;
+uint16_t control_timeout = 0;
+uint16_t control_timeout2 = 0;
 
 fan_control_state state;
 
@@ -56,16 +57,16 @@ void update_fan_temp() {
     } else if (flags.bitfield_DATA_6F & 0x02) {
       /* Custom fan speed requested */
       state = fan_control_state::custom_fan_speed;
-    } else if (sensors.CPU_temperature > 74 || sensors.CPU_temp_predicted > 86) {
+    } else if (sensors.CPU_temperature > 74 || CPU_temp_predicted > 86) {
       /* CPU is warming up */
       state = fan_control_state::board_hot;
-    } else if (sensors.CPU_temp_predicted > 74) {
+    } else if (CPU_temp_predicted > 74) {
       /* Predicted temp is in caution range */
       state = fan_control_state::board_hot;
     } else if (sensors.board_temperature > 60) {
       /* Board getting warm */
       state = fan_control_state::board_hot;
-    } else if (sensors.CPU_temp_predicted > 73) {
+    } else if (CPU_temp_predicted > 73) {
       /* Check CPU temp increase trend */
       if (!something_with_cpu_temp) { // CPU not heating up
         state = fan_control_state::state9;

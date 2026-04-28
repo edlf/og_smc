@@ -28,6 +28,7 @@ enum class smi_power_state {
 };
 
 void init();
+void setStateOverheatCooldownWait();
 void printState();
 uint8_t update();
 void setStateCase11();

@@ -22,6 +22,7 @@ bool isState1();
 void setWarmReset1();
 void setColdReset();
 void update();
+void printState();
 
 } // namespace BootChallenge
 } // namespace PLL_Reset

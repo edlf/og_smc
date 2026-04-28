@@ -11,9 +11,22 @@ namespace SMC {
 namespace PowerStandby {
 
 power_standby_state state;
+uint16_t power_timeout3 = 0;
 
 void init(){
   state = power_standby_state::initial;
+}
+
+void setPowerTimeout3(uint16_t val) {
+  power_timeout3 = val;
+}
+
+void powerTimeout3Decrement() {
+  power_timeout3--;
+}
+
+uint16_t getPowerTimeout3() {
+  return power_timeout3;
 }
 
 uint8_t update() {
@@ -47,7 +60,7 @@ uint8_t update() {
   case power_standby_state::turn_on_power_no_av: // State 3
     hal::turn_on_psu();
     hal::set_fan_on();
-    timers.power_timeout3 = 50;
+    power_timeout3 = 50;
     clearStatusBit(power_change_requested);
     state = power_standby_state::powered_up_wait_power_ok;
     break;
@@ -59,7 +72,7 @@ uint8_t update() {
     if (hal::get_power_ok()) {
       state = power_standby_state::powered_up;
     } else {
-      if (--timers.power_timeout3 == 0) {
+      if (--power_timeout3 == 0) {
         panic("POWER_OK timeout");
       } else {
         hal::timer1_wait();
@@ -87,7 +100,7 @@ uint8_t update() {
     flags.bitfield_DATA_73 |= 0x02;                    // Set eject flag
     hal::turn_on_psu();
     hal::set_fan_on();
-    timers.power_timeout3 = 0x32; // 50 cycles
+    power_timeout3 = 0x32; // 50 cycles
     state = power_standby_state::powered_up_wait_power_ok_alternative;
     break;
 
@@ -97,7 +110,7 @@ uint8_t update() {
 
     if (hal::get_power_ok()) {
       state = power_standby_state::powered_up_alt;
-    } else if (--timers.power_timeout3 == 0) {
+    } else if (--power_timeout3 == 0) {
       panic("POWER_OK timeout");
     } else {
       hal::timer1_wait();

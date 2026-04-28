@@ -9,19 +9,23 @@ namespace Dvd {
 uint8_t raw_tray_status_filtered;
 
 dvd_tray_state dvd_tray;
-uint8_t tray_eject;
 update_dvd_tray_three_state dvd_tray_three; // jump_index_sub_code_519
 update_eject_tray_state update_eject_tray;
 
-uint16_t tray_state_timer;
-uint16_t eject_timeout;
-uint16_t dvd_tray_timeout;
+uint16_t tray_state_timer = 0;
+uint16_t eject_timeout = 0;
+uint16_t dvd_tray_timeout = 0;
+uint8_t tray_eject;
+uint8_t tray_status_raw = 0;
 
 void init() {
   update_eject_tray = update_eject_tray_state::initial;
   dvd_tray_three = update_dvd_tray_three_state::initial;
   dvd_tray = dvd_tray_state::initial;
+  eject_timeout = 0;
+  dvd_tray_timeout = 0;
   tray_eject = 0;
+  tray_status_raw = 0;
 }
 
 void initDdvdTray() {
@@ -50,16 +54,16 @@ void updateDvdTray() {
     break;
 
   case dvd_tray_state::state2:
-    sensors.tray_status_raw = hal::get_tray_state() & 0x70;
-    raw_tray_status_filtered = sensors.tray_status_raw;
-    if ((sensors.tray_status ^ sensors.tray_status_raw) != 0) {
+    tray_status_raw = hal::get_tray_state() & 0x70;
+    raw_tray_status_filtered = tray_status_raw;
+    if ((sensors.tray_status ^ tray_status_raw) != 0) {
       dvd_tray = dvd_tray_state::state3;
     }
     break;
 
   case dvd_tray_state::state3:
     tray_state = hal::get_tray_state();
-    sensors.tray_status_raw = tray_state & 0x70;
+    tray_status_raw = tray_state & 0x70;
     if ((tray_state & 0x70) != raw_tray_status_filtered) {
       dvd_tray = dvd_tray_state::state2;
     } else {
@@ -68,17 +72,17 @@ void updateDvdTray() {
     break;
 
   case dvd_tray_state::state4:
-    sensors.tray_status = sensors.tray_status_raw;
-    if (sensors.tray_status_raw == 0x30) {
+    sensors.tray_status = tray_status_raw;
+    if (tray_status_raw == 0x30) {
       if (utils::checkBitNo(flags.bitfield_DATA_72, 4) != 0) {
         utils::setBitNo(flags.bitfield_DATA_71, 2);
       }
-    } else if (sensors.tray_status_raw == 0) {
+    } else if (tray_status_raw == 0) {
       if (utils::checkBitNo(flags.bitfield_DATA_72, 4) != 0) {
         utils::setBitNo(flags.bitfield_DATA_73, 5);
       }
     } else {
-      if ((sensors.tray_status_raw != 0x60) && (sensors.tray_status_raw != 0x40)) {
+      if ((tray_status_raw != 0x60) && (tray_status_raw != 0x40)) {
         dvd_tray = dvd_tray_state::state2;
         utils::setBitNo(flags.bitfield_DATA_72, 4);
         return;

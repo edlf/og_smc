@@ -20,7 +20,6 @@ volatile uint8_t bios_response_byte1;
 
 flags_struct flags;
 sensors_struct sensors;
-timers_struct timers;
 
 void resetInterruptReason() {
   flags.interrupt_reason = 0;
@@ -64,6 +63,7 @@ void fireSystemInterrupt() {
 }
 
 void configureEncoder() {
+  debug::print_message("SMC: Configure Encoder");
   Encoder encoder = DetectVideoEncoder();
 
   switch (encoder) {
@@ -273,7 +273,7 @@ void main_loop() {
 
   hal::enableWatchdog();
 
-  timers.power_timeout3 = 1;
+  PowerStandby::setPowerTimeout3(1);
   BootChallenge::challenge_struct& challenge = BootChallenge::getChallengeStructRef();
 
   do {
@@ -340,16 +340,16 @@ void main_loop() {
       hal::petWatchdog();
 
       globals_init();
-      timers.power_timeout3 = 25;
+      PowerStandby::setPowerTimeout3(25);
 
       do {
         wait_for_isr();
         hal::petWatchdog();
         FrontPanelSW::updatePower();
-        timers.power_timeout3--;
-      } while (timers.power_timeout3 != 0);
+        PowerStandby::powerTimeout3Decrement();
+      } while (PowerStandby::getPowerTimeout3() != 0);
 
-      timers.power_timeout3 = 0;
+      PowerStandby::setPowerTimeout3(0);
     } else {
       loop_start_time = hal::get_ms_since_boot();
     }
@@ -376,13 +376,8 @@ void globals_init() {
 
   sensors.CPU_temperature = 0;
   sensors.board_temperature = 0;
-  sensors.CPU_temp_predicted = 0;
   sensors.tray_status = 0;
   sensors.vmode = 0;
-  sensors.vmode_raw = 0;
-
-  timers.power_timeout = 0;
-  timers.power_timeout3 = 0;
 }
 
 void shutdown_xbox() {

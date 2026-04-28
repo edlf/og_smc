@@ -22,7 +22,6 @@ namespace SMC {
 // TODO: remove hacks
 extern flags_struct flags;
 extern sensors_struct sensors;
-extern timers_struct timers;
 extern bool something_with_cpu_temp;
 extern volatile uint8_t ram_test_response0;
 extern volatile uint8_t ram_test_response1;

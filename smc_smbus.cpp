@@ -39,6 +39,7 @@ static bool command_received = false;
 static uint8_t smbus_command = 0;
 static uint8_t smbus_data = 0;
 static uint8_t smbus_version_counter = 0;
+uint8_t CPU_temperature_previous;
 
 uint8_t smbus_read_handler(uint8_t command) {
   uint8_t response = 0;
@@ -332,10 +333,10 @@ void read_temperatures() {
 
   // TODO: CPU
   sensors.CPU_temperature = 55;
-  sensors.CPU_temperature_previous = sensors.CPU_temperature;
+  CPU_temperature_previous = sensors.CPU_temperature;
   sensors.board_temperature = 55;
   // if (i2c_read(I2C_TEMP_SENSOR_ADDRESS, 0x01, &(sensors.CPU_temperature))) {
-  //   sensors.CPU_temperature_previous = sensors.CPU_temperature;
+  //   CPU_temperature_previous = sensors.CPU_temperature;
   // }
 
   // Board, near MCPX for 1.0-1.4

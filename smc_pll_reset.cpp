@@ -5,10 +5,25 @@
 #include "utils.hpp"
 #include "pico/stdlib.h" // TODO move busywait to hal
 
+#include <vector>
+#include <string>
+
 namespace SMC {
 namespace PLL_Reset {
 
 pll_sysreset_state state;
+
+const std::vector<std::string> state_names {
+  "initial",
+  "state1",
+  "state2",
+  "cold_reset",
+  "warm_reset_2",
+  "warm_reset_1",
+  "state6",
+  "state7",
+  "state8"
+};
 
 void init() {
   state = pll_sysreset_state::initial;
@@ -26,7 +41,21 @@ void setColdReset() {
   state = pll_sysreset_state::cold_reset;
 }
 
+void printState() {
+    const size_t bc_state = static_cast<size_t>(state);
+    std::string msg = "PLL Reset state [" + std::to_string(bc_state) + "]";
+
+    if (bc_state <= state_names.size()) {
+        msg += " " + state_names[bc_state];
+    }
+
+    debug::print_message(msg);
+}
+
+
 void update() {
+  printState();
+
   switch (state) {
   case pll_sysreset_state::initial:
     hal::assertSystemReset();
@@ -82,7 +111,7 @@ void update() {
     }
 
     Fan::control_timeout = 1;
-    configureConexantEncoder();
+    configureEncoder();
     hal::liftSystemReset();
     flags.bitfield_DATA_73 |= 0x08; // Set initialization flag
 
@@ -96,7 +125,7 @@ void update() {
 
   case pll_sysreset_state::warm_reset_2:
     hal::liftSystemReset();
-    configureConexantEncoder();
+    configureEncoder();
     flags.bitfield_DATA_73 |= 0x08; // Set initialization flag
 
     /* Wait for encoder communication */

@@ -8,12 +8,14 @@ namespace Video {
 
 bool override = false;
 uint8_t override_mode = 0b00000010;
-uint8_t video_mode;
-uint8_t previous_video_mode;
+uint8_t video_mode = 0;
+uint8_t previous_video_mode = 0;
+uint8_t vmode_raw = 0;
 
 void init() {
   video_mode = 0;
-  previous_video_mode = 200;
+  previous_video_mode = UINT8_MAX;
+  vmode_raw = 0;
 }
 
 void update() {
@@ -22,18 +24,18 @@ void update() {
   }
 
   if (override) {
-    SMC::sensors.vmode_raw = override_mode;
+    vmode_raw = override_mode;
   } else {
-    SMC::sensors.vmode_raw = hal::get_video_mode();
+    vmode_raw = hal::get_video_mode();
   }
 
-  if (previous_video_mode != SMC::sensors.vmode_raw) {
-    printMode(SMC::sensors.vmode_raw);
-    previous_video_mode = SMC::sensors.vmode_raw;
+  if (previous_video_mode != vmode_raw) {
+    printMode(vmode_raw);
+    previous_video_mode = vmode_raw;
   }
 
-  if (SMC::sensors.vmode_raw != SMC::sensors.vmode) {
-    SMC::sensors.vmode = SMC::sensors.vmode_raw;
+  if (vmode_raw != SMC::sensors.vmode) {
+    SMC::sensors.vmode = vmode_raw;
     SMC::setStatusBit(SMC::video_mode_changed);
   }
 }
