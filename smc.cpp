@@ -63,12 +63,42 @@ void fireSystemInterrupt() {
   hal::smi_pin_on();
 }
 
+void configureEncoder() {
+  Encoder encoder = DetectVideoEncoder();
+
+  switch (encoder) {
+    case Encoder::Conexant:
+      configureConexantEncoder();
+      break;
+
+    case Encoder::Focus:
+      configureFocusEncoder();
+      break;
+
+    case Encoder::Xcalibur:
+      configureXcaliburEncoder();
+      break;
+
+    default:
+      debug::print_critical("No encoder returned");
+      break;
+  }
+}
+
 void configureConexantEncoder() {
   debug::print_message("SMC: Configure Conexant Encoder");
 
   constexpr size_t len = 2;
   uint8_t config[len] = {0xBA, 0x3F};
   i2c_write_burst_blocking(I2C_PORT, I2C_CONEXANT_ADDRESS, config, len);
+}
+
+void configureFocusEncoder() {
+  // TODO
+}
+
+void configureXcaliburEncoder() {
+  // TODO
 }
 
 void smc_gpio_callback(unsigned int gpio, uint32_t events) {
@@ -380,6 +410,25 @@ void panic(const std::string message) {
     hal::pico_led_off();
     sleep_ms(500);
   }
+}
+
+Encoder DetectVideoEncoder(void)
+{
+  /* TODO: Based on XBLAST
+  if (I2CTransmitByteGetReturn(I2C_CONEXANT_ADDRESS, 0x00) != ERR_I2C_ERROR_BUS)
+  {
+    return Encoder::Conexant;
+  }
+  else if (I2CTransmitByteGetReturn(I2C_FOCUS_ADDRESS, 0x00) != ERR_I2C_ERROR_BUS)
+  {
+    return Encoder::Focus;
+  }
+  else
+  {
+    return Encoder::Xcalibur;
+  }
+  */
+  return Encoder::Conexant;
 }
 
 } // namespace SMC
