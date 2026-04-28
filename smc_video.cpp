@@ -6,6 +6,8 @@
 namespace SMC {
 namespace Video {
 
+bool override = false;
+uint8_t override_mode = 0b00000010;
 uint8_t video_mode;
 uint8_t previous_video_mode;
 
@@ -15,7 +17,15 @@ void init() {
 }
 
 void update() {
-  SMC::sensors.vmode_raw = hal::get_video_mode();
+  if (!SMI::isXboxPowered()) {
+    return;
+  }
+
+  if (override) {
+    SMC::sensors.vmode_raw = override_mode;
+  } else {
+    SMC::sensors.vmode_raw = hal::get_video_mode();
+  }
 
   if (previous_video_mode != SMC::sensors.vmode_raw) {
     printMode(SMC::sensors.vmode_raw);

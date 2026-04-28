@@ -124,7 +124,6 @@ uint8_t get_video_mode() {
     video_mode = video_mode | (1 << 3);
   }
 
-  // debug::print_message("GPIO: Get video mode " + std::to_string(video_mode));
   return video_mode;
 }
 
@@ -265,7 +264,7 @@ void init() {
 
 
   debug::print_message("GPIO: I2C Init");
-  i2c_init(i2c0, I2C_BAUDRATE);
+  i2c_init(I2C_PORT, I2C_BAUDRATE);
 }
 
 void assertSystemReset() {

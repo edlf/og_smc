@@ -68,7 +68,7 @@ void configureConexantEncoder() {
 
   constexpr size_t len = 2;
   uint8_t config[len] = {0xBA, 0x3F};
-  i2c_write_burst_blocking(i2c0, 0x8A, config, len);
+  i2c_write_burst_blocking(I2C_PORT, I2C_CONEXANT_ADDRESS, config, len);
 }
 
 void smc_gpio_callback(unsigned int gpio, uint32_t events) {
@@ -239,7 +239,7 @@ void main_loop() {
   init_irqs();
 
   debug::print_message("MAIN: Set I2C interrupt");
-  i2c_slave_init(i2c0, I2C_SLAVE_ADDRESS, &handle_SMBus_interrupt);
+  i2c_slave_init(I2C_PORT, I2C_SLAVE_ADDRESS, &handle_SMBus_interrupt);
 
   hal::enableWatchdog();
 
